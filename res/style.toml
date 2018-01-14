@@ -1,0 +1,8 @@
+shadow = false
+
+[colors]
+
+background = ["black"]
+primary = "black"
+secondary ="magenta"
+tertiary = "magenta"
