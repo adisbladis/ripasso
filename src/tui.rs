@@ -3,7 +3,7 @@ extern crate cursive;
 
 use self::cursive::Cursive;
 use self::cursive::traits::*;
-use self::cursive::views::{Dialog, LinearLayout,ListView, TextView, EditView};
+use self::cursive::views::{Dialog, LinearLayout,ListView, SelectView, TextView, EditView};
 use self::cursive::align::HAlign;
 use self::cursive::direction::Orientation;
 use pass;
@@ -14,6 +14,7 @@ use std::process;
 pub fn main() {
     // Creates the cursive root - required for every application.
     let mut siv = Cursive::new();
+    siv.load_theme(include_str!("../res/style.toml")).unwrap();
 
     // Load and watch all the passwords in the background
     let (password_rx, passwords) = match pass::watch() {
@@ -26,19 +27,18 @@ pub fn main() {
 
     let searchbox = EditView::new()
         .on_edit(move |s, q, l| {
-            s.call_on_id("results", |l: &mut ListView| {
+            s.call_on_id("results", |l: &mut SelectView| {
                 let r = pass::search(&passwords, String::from(q));
                 l.clear();
                 for p in r.iter() {
-                    l.add_child(
-                        &format!("item {}", &p.name),
-                        TextView::new(p.name.clone()).fixed_height(5),
+                    l.add_item(
+                        format!("{}", &p.name), p.name.clone()
+                        //TextView::new(p.name.clone()).fixed_height(5),
                     );
                 }
-                l.focus();
             });
         })
-        .fixed_width(20);
+        .fixed_width(72);
 
 
     // Creates a dialog with a single "Quit" button
@@ -47,7 +47,7 @@ pub fn main() {
             LinearLayout::new(Orientation::Vertical)
                 .child(searchbox)
                 .child(
-                    ListView::new()
+                    SelectView::<String>::new()
                         .with_id("results")
                 )
                 .full_height()
