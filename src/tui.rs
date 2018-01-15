@@ -12,9 +12,10 @@ use std::process;
 
 
 pub fn main() {
-    // Creates the cursive root - required for every application.
     let mut siv = Cursive::new();
-    siv.load_theme(include_str!("../res/style.toml")).unwrap();
+
+    //siv.load_theme(include_str!("../res/style.toml")).unwrap();
+    siv.load_theme_file("res/style.toml").unwrap();
 
     // Load and watch all the passwords in the background
     let (password_rx, passwords) = match pass::watch() {
@@ -31,31 +32,34 @@ pub fn main() {
                 let r = pass::search(&passwords, String::from(q));
                 l.clear();
                 for p in r.iter() {
-                    l.add_item(
-                        format!("{}", &p.name), p.name.clone()
-                        //TextView::new(p.name.clone()).fixed_height(5),
-                    );
+                    l.add_item(p.name.clone(), p.name.clone());
                 }
             });
         })
         .fixed_width(72);
 
+    let results = SelectView::<String>::new()
+        .with_id("results")
+        .full_height();
 
-    // Creates a dialog with a single "Quit" button
     siv.add_layer(
-        Dialog::around(
-            LinearLayout::new(Orientation::Vertical)
-                .child(searchbox)
-                .child(
-                    SelectView::<String>::new()
-                        .with_id("results")
+        LinearLayout::new(Orientation::Vertical)
+            .child(
+                Dialog::around(
+                    LinearLayout::new(Orientation::Vertical)
+                        .child(searchbox)
+                        .child(results)
+                        .fixed_width(72)
                 )
-                .full_height()
-        )
-            .title("Ripasso")
+                    .title("Ripasso")
+            )
+            .child(
+                LinearLayout::new(Orientation::Horizontal)
+                    .child(TextView::new("CTRL-X: Quit "))
+                    .child(TextView::new("CTRL-J: Down "))
+                    .child(TextView::new("CTRL-N: Up "))
+                    .full_width()
+            )
     );
-
-
-    // Starts the event loop.
     siv.run();
 }
