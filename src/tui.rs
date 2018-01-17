@@ -6,16 +6,14 @@ use self::cursive::traits::*;
 use self::cursive::views::{Dialog, LinearLayout,ListView, SelectView, TextView, EditView};
 use self::cursive::align::HAlign;
 use self::cursive::direction::Orientation;
+use self::cursive::event::Event;
+
 use pass;
 use std;
 use std::process;
 
 
 pub fn main() {
-    let mut siv = Cursive::new();
-
-    //siv.load_theme(include_str!("../res/style.toml")).unwrap();
-    siv.load_theme_file("res/style.toml").unwrap();
 
     // Load and watch all the passwords in the background
     let (password_rx, passwords) = match pass::watch() {
@@ -26,6 +24,26 @@ pub fn main() {
         }
     };
 
+    let mut siv = Cursive::new();
+
+    siv.add_global_callback(Event::CtrlChar('y'),|s|{
+        println!("Quit");
+    } );
+
+    siv.add_global_callback(Event::CtrlChar('n'),|s|{
+        s.call_on_id("results", |l: &mut SelectView| {
+            l.select_down(1);
+        });
+    } );
+
+    siv.add_global_callback(Event::CtrlChar('p'),|s|{
+        s.call_on_id("results", |l: &mut SelectView| {
+            l.select_up(1);
+        });
+    } );
+
+    //siv.load_theme(include_str!("../res/style.toml")).unwrap();
+    siv.load_theme_file("res/style.toml").unwrap();
     let searchbox = EditView::new()
         .on_edit(move |s, q, l| {
             s.call_on_id("results", |l: &mut SelectView| {
@@ -55,9 +73,9 @@ pub fn main() {
             )
             .child(
                 LinearLayout::new(Orientation::Horizontal)
-                    .child(TextView::new("CTRL-X: Quit "))
-                    .child(TextView::new("CTRL-J: Down "))
-                    .child(TextView::new("CTRL-N: Up "))
+                    .child(TextView::new("CTRL-N: Next "))
+                    .child(TextView::new("CTRL-P: Previous "))
+                    .child(TextView::new("CTRL-Y: Copy "))
                     .full_width()
             )
     );
