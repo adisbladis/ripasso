@@ -15,6 +15,18 @@ use notify::Watcher;
 
 use std::sync::{Arc, Mutex};
 
+trait PasswordStore {
+    fun search(String) -> Vec<PasswordEntry> 
+    fun watch() -> chan<PasswordEvent>
+    fun create(PasswordEntry) -> Error
+    fun update(PasswordEntry) -> Error
+    fun delete(PasswordEntry) -> Error
+}
+
+// helpers
+pub generate_password(options) -> String
+
+
 #[derive(Clone)]
 pub struct PasswordEntry {
     pub name: String,

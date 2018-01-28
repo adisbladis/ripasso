@@ -23,26 +23,26 @@ fn start_qml() {
 }
 
 #[cfg(feature = "use-tui")]
-fn start_tui(){
+fn start_tui() {
     use ripasso::tui;
     tui::main()
 }
 
 #[cfg(not(feature = "use-tui"))]
-fn start_tui(){
+fn start_tui() {
     print!("Text UI not enabled, compile with --features=use-tui to enable")
 }
 
 fn main() {
     println!("Welcome to ripasso");
     if cfg!(feature = "use-qml") {
-        return start_qml()
+        return start_qml();
     }
     if cfg!(feature = "use-gtk") {
-        return start_gtk()
+        return start_gtk();
     }
-    if cfg!(feature = "use-tui"){
-        return start_tui()
+    if cfg!(feature = "use-tui") {
+        return start_tui();
     }
     println!("No UI compiled, compile with --features=use-gtk or --features=use-qml to enable")
 }
